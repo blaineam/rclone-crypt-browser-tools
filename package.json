@@ -1,0 +1,20 @@
+{
+  "name": "rclone-crypt-browser-tools",
+  "version": "1.0.0",
+  "description": "rclone crypto library for use in a modern web browser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify -p esmify -t uglifyify index.js -o rclone-crypt-browser-tools.js"
+  },
+  "author": "Blaine Miller",
+  "license": "MIT",
+  "dependencies": {
+    "@fyears/rclone-crypt": "^0.0.7"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "esmify": "^2.1.1",
+    "uglifyify": "^5.0.2"
+  }
+}

@@ -1,0 +1,81 @@
+<html>
+  <head> </head>
+  <body>
+    <input name="password" type="password" id="password" />
+    <input type="file" name="file" id="file" />
+    <button onclick="run()">Run Demo</button>
+    <pre id="logs"></pre>
+    <iframe id="src"></iframe>
+    <iframe id="dest"></iframe>
+    <script src="./rclone-crypt-browser-tools.js"></script>
+    <script>
+      window.run = async function () {
+        let password = document.getElementById("password").value;
+        let file = document.querySelector('input[type="file"]').files[0];
+        document.getElementById("logs").append("\nFile loaded: " + file.name);
+        let srcurl = window.URL.createObjectURL(file);
+        document.getElementById("src").setAttribute("src", srcurl);
+        document.getElementById("logs").append("\nFile loaded: " + file.name);
+        let path = file.name;
+        let dataurl = srcurl;
+        try {
+          path = await window.rcloneCrypt.encryptPath(file.name, password);
+          document
+            .getElementById("logs")
+            .append("\nFilename Encrypted: " + path);
+        } catch (e) {
+          console.log(e);
+          document
+            .getElementById("logs")
+            .append("\nFilename Encryption Failed.");
+        }
+
+        try {
+          dataurl = window.rcloneCrypt.render(
+            await window.rcloneCrypt.encrypt(srcurl, password),
+            path,
+            false,
+            false,
+          );
+          document.getElementById("logs").append("\nFile Encrypted: " + path);
+        } catch (e) {
+          console.log(e);
+          document.getElementById("logs").append("\nFile Encryption Failed.");
+        }
+        let destpath = path;
+        try {
+          destpath = await window.rcloneCrypt.decryptPath(path, password);
+
+          document
+            .getElementById("logs")
+            .append("\nFilename Decrypted: " + destpath);
+        } catch (e) {
+          console.log(e);
+          document
+            .getElementById("logs")
+            .append("\nFilename Decryption Failed.");
+        }
+        try {
+          const destdata = await window.rcloneCrypt.decrypt(dataurl, password);
+          let desturl = window.rcloneCrypt.render(
+            destdata,
+            destpath,
+            false,
+            false,
+          );
+
+          document.getElementById("dest").setAttribute("src", desturl);
+          document
+            .getElementById("logs")
+            .append("\nFile Decrypted: " + destpath);
+          if (confirm("Download Decrypted File: " + destpath)) {
+            window.rcloneCrypt.render(destdata, destpath, true, true);
+          }
+        } catch (e) {
+          console.log(e);
+          document.getElementById("logs").append("\nFile Decryption Failed.");
+        }
+      };
+    </script>
+  </body>
+</html>
